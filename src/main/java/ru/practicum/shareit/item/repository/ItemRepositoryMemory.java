@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.dao;
+package ru.practicum.shareit.item.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class ItemDaoMemory implements ItemDao {
+public class ItemRepositoryMemory implements ItemRepository {
 
     private final Map<Long, Item> itemList = new HashMap<>();
     private Long itemId = 0L;

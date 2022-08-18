@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.dao;
+package ru.practicum.shareit.item.repository;
 
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -6,7 +6,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 import java.util.Optional;
 
-public interface ItemDao {
+public interface ItemRepository {
 
     Item addItem(User user, Item item);
 
