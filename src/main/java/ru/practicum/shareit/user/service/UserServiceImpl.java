@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -23,27 +24,36 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public UserDto create(User user) {
-        checkUserByEmail(user);
-        return UserMapper.toUserDto(userRepository.create(user));
+        return UserMapper.toUserDto(userRepository.save(user));
     }
 
+    @Transactional
     @Override
     public UserDto update(User user) {
-        getUserById(user.getId());
-        checkUserByEmail(user);
-        return UserMapper.toUserDto(userRepository.update(user));
+        UserDto userDto = getUserById(user.getId());
+        User oldUser = UserMapper.toUser(userDto);
+        if (user.getName() != null && !(user.getName().trim().isBlank())) {
+            oldUser.setName(user.getName());
+        }
+        if (user.getEmail() != null && !(user.getEmail().trim().isBlank())) {
+            oldUser.setEmail(user.getEmail());
+        }
+        return UserMapper.toUserDto(userRepository.save(oldUser));
     }
 
+    @Transactional
     @Override
     public void deleteUser(long id) {
-        userRepository.deleteUser(id);
+        userRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserDto getUserById(long id) {
-        return UserMapper.toUserDto(userRepository.findUserById(id).orElseThrow(() ->
+        return UserMapper.toUserDto(userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Пользователь с таким id не найден!")));
     }
 
@@ -53,6 +63,5 @@ public class UserServiceImpl implements UserService {
         if (userList.size() > 0) {
             throw new ValidationException("Пользователь с таким email уже существует!");
         }
-
     }
 }
