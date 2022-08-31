@@ -12,19 +12,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "COMMENTS", schema = "public")
+@Table(name = "comments", schema = "public")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "COMMENT_ID", nullable = false)
+    @Column(name = "comment_id", nullable = false)
     private long id;
     @Column(nullable = false)
     private String text;
     @ManyToOne(cascade = {CascadeType.MERGE})
-    @JoinColumn(name = "ITEM_ID")
+    @JoinColumn(name = "item_id")
     private Item item;
     @ManyToOne(cascade = {CascadeType.MERGE})
-    @JoinColumn(name = "AUTHOR_ID")
+    @JoinColumn(name = "author_id")
     private User author;
     private LocalDateTime created;
 }

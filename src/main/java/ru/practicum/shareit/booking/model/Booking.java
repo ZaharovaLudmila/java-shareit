@@ -13,22 +13,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "BOOKINGS", schema = "public")
+@Table(name = "bookings", schema = "public")
 public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "BOOKING_ID", nullable = false)
+    @Column(name = "booking_id", nullable = false)
     private long id;
-    @Column(name = "START_DATE")
+    @Column(name = "start_date")
     private LocalDateTime start;
-    @Column(name = "END_DATE")
+    @Column(name = "end_date")
     private LocalDateTime end;
     @ManyToOne(cascade = {CascadeType.MERGE})
-    @JoinColumn(name = "ITEM_ID")
+    @JoinColumn(name = "item_id")
     private Item item;
     @ManyToOne(cascade = {CascadeType.MERGE})
-    @JoinColumn(name = "BOOKER_ID")
+    @JoinColumn(name = "booker_id")
     private User booker;
     @Enumerated(EnumType.STRING)
     private BookingStatus status;

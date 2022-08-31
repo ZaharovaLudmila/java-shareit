@@ -11,19 +11,19 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "REQUESTS", schema = "public")
+@Table(name = "requests", schema = "public")
 public class ItemRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "REQUEST_ID", nullable = false)
+    @Column(name = "request_id", nullable = false)
     private long id;
     @NotBlank
     @Column(nullable = false)
     private String description;
     @ManyToOne(cascade = {CascadeType.ALL})
-    @JoinColumn(name = "REQUESTER_ID")
+    @JoinColumn(name = "requester_id")
     private User requester;
-    @Column(name = "CREATED_DATE")
+    @Column(name = "created_date")
     private LocalDateTime created;
 }
