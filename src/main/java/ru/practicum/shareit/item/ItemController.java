@@ -6,7 +6,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.Create;
 import ru.practicum.shareit.Update;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.ArrayList;
@@ -39,13 +41,9 @@ public class ItemController {
     }
 
     @GetMapping("{itemId}")
-    public ItemDto findItem(@PathVariable long itemId) {
-        return itemService.findItem(itemId);
-    }
-
-    @GetMapping()
-    public List<ItemDto> findAll(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.findAll(userId);
+    public ItemDtoResponse findItem(@RequestHeader("X-Sharer-User-Id") long userId,
+                                    @PathVariable long itemId) {
+        return itemService.findItem(itemId, userId);
     }
 
     @GetMapping("/search")
@@ -54,5 +52,19 @@ public class ItemController {
             return new ArrayList<>();
         }
         return itemService.searchItems(text);
+    }
+
+    @GetMapping()
+    public List<ItemDtoResponse> findAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.findAll(userId);
+    }
+
+    @PostMapping("{itemId}/comment")
+    public CommentDto update(@RequestHeader("X-Sharer-User-Id") long userId,
+                          @Validated({Create.class}) @RequestBody CommentDto commentDto,
+                          @PathVariable long itemId) {
+        CommentDto comment = itemService.addComment(commentDto, userId, itemId);
+        log.info("Был добавлен отзыв для вещи с id {}", itemId);
+        return comment;
     }
 }
