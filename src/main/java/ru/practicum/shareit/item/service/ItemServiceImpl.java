@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -11,6 +12,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.requests.model.ItemRequest;
+import ru.practicum.shareit.requests.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -30,13 +33,19 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository requestRepository;
 
     @Transactional
     @Override
     public ItemDto addItem(long userId, ItemDto itemDto) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с таким id не найден!"));
-        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto, user)));
+        ItemRequest request = null;
+        if (itemDto.getRequestId() != null) {
+            request = requestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new NotFoundException("Запрос с таким id не найден!"));
+        }
+        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto, user, request)));
     }
 
     @Transactional
@@ -76,9 +85,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDtoResponse> findAll(long userId) {
+    public List<ItemDtoResponse> findAll(long userId, Pageable pageRequest) {
         checkUser(userId);
-        List<Item> itemList = itemRepository.findItemsByOwnerId(userId);
+        List<Item> itemList = itemRepository.findItemsByOwnerId(userId, pageRequest);
         List<ItemDtoResponse> itemDtoResponseList = new ArrayList<>();
         for (Item item : itemList) {
             itemDtoResponseList.add(generateItemDtoResponse(item, userId));
@@ -87,8 +96,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItems(String text) {
-        return itemRepository.searchItems(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+    public List<ItemDto> searchItems(String text, Pageable pageRequest) {
+        return itemRepository.searchItems(text, pageRequest).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Transactional
@@ -98,12 +107,11 @@ public class ItemServiceImpl implements ItemService {
                 new NotFoundException("Пользователь с таким id не найден!"));
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException("Вещь с таким id не найдена!"));
-        LocalDateTime now = LocalDateTime.now();
-        Booking booking = bookingRepository.findAllByBookerIdAAndItemId(userId, itemId, now).stream()
+        Booking booking = bookingRepository.findAllByBookerIdAAndItemId(userId, itemId, commentDto.getCreated()).stream()
                 .findFirst().orElseThrow(() -> new BookingStateException("Запрос на бронирование не найден!"));
         if (booking != null) {
             return CommentMapper.toCommentDto(commentRepository.save(new Comment(commentDto.getId(),
-                    commentDto.getText(), item, user, LocalDateTime.now())));
+                    commentDto.getText(), item, user, commentDto.getCreated())));
         } else {
             throw new RuntimeException("Пользователь с id " + " не брал вещь с id" + " в аренду!");
         }
