@@ -50,7 +50,7 @@ public class ItemRequestController {
     }
 
     @GetMapping("{requestId}")
-    public ItemRequestDtoResponse findAll(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ItemRequestDtoResponse findRequestById(@RequestHeader("X-Sharer-User-Id") long userId,
                                                 @PathVariable long requestId) {
         return requestService.findRequest(userId, requestId);
     }

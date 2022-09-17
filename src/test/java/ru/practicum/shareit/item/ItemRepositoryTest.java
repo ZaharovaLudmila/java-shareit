@@ -34,6 +34,7 @@ class ItemRepositoryTest {
 
     @BeforeEach
     void beforeEach() {
+
         user1 = userRepository.save(new User(1, "user1", "user1@mail.ru"));
         user2 = userRepository.save(new User(2, "user2", "user2@mail.ru"));
         item1 = itemRepository.save(

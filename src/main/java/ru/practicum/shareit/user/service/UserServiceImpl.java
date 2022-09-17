@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -55,13 +54,5 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(long id) {
         return UserMapper.toUserDto(userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Пользователь с таким id не найден!")));
-    }
-
-    public void checkUserByEmail(User user) {
-        List<User> userList = userRepository.findAll().stream()
-                .filter(userInList -> userInList.getEmail().equals(user.getEmail())).collect(Collectors.toList());
-        if (userList.size() > 0) {
-            throw new ValidationException("Пользователь с таким email уже существует!");
-        }
     }
 }
