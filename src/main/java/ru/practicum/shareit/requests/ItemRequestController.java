@@ -25,12 +25,10 @@ import java.util.List;
 public class ItemRequestController {
 
     private final ItemRequestService requestService;
-   /* @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-    @Positive @RequestParam(name = "size", defaultValue = "10") Integer size*/
 
     @PostMapping()
     public ItemRequestDtoResponse addItemRequest(@RequestHeader("X-Sharer-User-Id") long userId,
-                                          @Validated({Create.class}) @RequestBody ItemRequestDto requestDto) {
+                                                 @Validated({Create.class}) @RequestBody ItemRequestDto requestDto) {
         ItemRequestDtoResponse request = requestService.addItemRequest(userId, requestDto);
         log.info("Был добавлен новый запрос id: {}, описание: {}", request.getId(), request.getDescription());
         return request;
@@ -43,15 +41,17 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDtoResponse> findAll(@RequestHeader("X-Sharer-User-Id") long userId,
-                                         @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                         @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                                @PositiveOrZero @RequestParam(name = "from", defaultValue = "0")
+                                                Integer from,
+                                                @Positive @RequestParam(name = "size", defaultValue = "10")
+                                                Integer size) {
         int page = from / size;
         return requestService.findAll(userId, PageRequest.of(page, size));
     }
 
     @GetMapping("{requestId}")
     public ItemRequestDtoResponse findRequestById(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                @PathVariable long requestId) {
+                                                  @PathVariable long requestId) {
         return requestService.findRequest(userId, requestId);
     }
 }

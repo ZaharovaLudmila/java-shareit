@@ -88,36 +88,37 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public List<BookingDto> findBookingByBookerId(long userId, String state, Pageable pageRequest) {
+        BookingState bookingState = getBookingState(state);
         checkUser(userId);
         LocalDateTime now = LocalDateTime.now();
-        switch (state) {
-            case "ALL":
+        switch (bookingState) {
+            case ALL:
                 return bookingRepository.findAllByBookerIdOrderByStartDesc(userId, pageRequest).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "CURRENT":
+            case CURRENT:
                 return bookingRepository
                         .findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId, now, now, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "PAST":
+            case PAST:
                 return bookingRepository.findAllByBookerIdAndEndIsBeforeOrderByStartDesc(userId, now, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "FUTURE":
+            case FUTURE:
                 return bookingRepository.findAllByBookerIdAndStartIsAfterOrderByStartDesc(userId, now, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "WAITING":
+            case WAITING:
                 return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING,
                                 pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "REJECTED":
+            case REJECTED:
                 return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED,
                                 pageRequest)
                         .stream()
@@ -131,35 +132,36 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public List<BookingDto> findBookingsByItemsOwnerId(long userId, String state, Pageable pageRequest) {
+        BookingState bookingState = getBookingState(state);
         checkUser(userId);
         LocalDateTime now = LocalDateTime.now();
-        switch (state) {
-            case "ALL":
+        switch (bookingState) {
+            case ALL:
                 return bookingRepository.findAllByItemsOwnerId(userId, pageRequest).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "CURRENT":
+            case CURRENT:
                 return bookingRepository
                         .findAllCurrentByItemsOwnerId(userId, now, now, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "PAST":
+            case PAST:
                 return bookingRepository.findAllPastByItemsOwnerId(userId, now, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "FUTURE":
+            case FUTURE:
                 return bookingRepository.findAllFutureByItemsOwnerId(userId, now, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "WAITING":
+            case WAITING:
                 return bookingRepository.findAllStatusByItemsOwnerId(userId, BookingStatus.WAITING, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
-            case "REJECTED":
+            case REJECTED:
                 return bookingRepository.findAllStatusByItemsOwnerId(userId, BookingStatus.REJECTED, pageRequest)
                         .stream()
                         .map(BookingMapper::toBookingDto)
@@ -172,6 +174,14 @@ public class BookingServiceImpl implements BookingService {
     private void checkUser(long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователь с таким id не найден!");
+        }
+    }
+
+    private BookingState getBookingState(String state) {
+        try {
+            return BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new BookingStateException("Unknown state: " + state);
         }
     }
 }
