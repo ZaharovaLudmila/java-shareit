@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-public class BookingDtoResponse {
+public class BookingDtoRequest {
     @FutureOrPresent(groups = {Create.class})
     private LocalDateTime start;
     @FutureOrPresent(groups = {Create.class})
