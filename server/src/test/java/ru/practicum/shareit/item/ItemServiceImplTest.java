@@ -179,7 +179,7 @@ class ItemServiceImplTest {
     @Test
     void findAll() {
         when(userRepository.existsById(anyLong())).thenReturn(true);
-        when(itemRepository.findItemsByOwnerId(1, Pageable.ofSize(20)))
+        when(itemRepository.findItemsByOwnerIdOrderById(1, Pageable.ofSize(20)))
                 .thenReturn(Collections.singletonList(item));
         when(bookingRepository.findAllByItemsId(anyLong())).thenReturn(Collections.emptyList());
         when(commentRepository.findCommentsByItemId(anyLong())).thenReturn(Collections.emptyList());

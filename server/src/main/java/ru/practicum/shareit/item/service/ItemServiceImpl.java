@@ -87,7 +87,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDtoResponse> findAll(long userId, Pageable pageRequest) {
         checkUser(userId);
-        List<Item> itemList = itemRepository.findItemsByOwnerId(userId, pageRequest);
+        List<Item> itemList = itemRepository.findItemsByOwnerIdOrderById(userId, pageRequest);
         List<ItemDtoResponse> itemDtoResponseList = new ArrayList<>();
         for (Item item : itemList) {
             itemDtoResponseList.add(generateItemDtoResponse(item, userId));
