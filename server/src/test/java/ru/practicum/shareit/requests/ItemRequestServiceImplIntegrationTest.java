@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.model.ItemRequest;
 import ru.practicum.shareit.requests.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -23,19 +23,14 @@ import static org.hamcrest.Matchers.notNullValue;
         properties = "db.name=shareIt_test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@DirtiesContext
-class ItemRequestServiceImplIntegrationTest {
-
+public class ItemRequestServiceImplIntegrationTest {
     private final EntityManager em;
     private final ItemRequestServiceImpl requestService;
+    private final UserRepository userRepository;
 
     @Test
     void addItemRequest() {
-        User user = new User(1, "user Name", "user@email.ru");
-        em.createNativeQuery("insert into users (user_name, email) values (?, ?)")
-                .setParameter(1, user.getName())
-                .setParameter(2, user.getEmail())
-                .executeUpdate();
+        User user = userRepository.save(new User(1, "user Name", "user@email.ru"));
 
         ItemRequestDto itemRequestDto = new ItemRequestDto(1, "request description", user, null);
         requestService.addItemRequest(user.getId(), itemRequestDto);
@@ -49,5 +44,4 @@ class ItemRequestServiceImplIntegrationTest {
         assertThat(request.getRequester(), equalTo(itemRequestDto.getRequester()));
         assertThat(request.getCreated(), notNullValue());
     }
-
 }

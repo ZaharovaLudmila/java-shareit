@@ -21,8 +21,8 @@ services:
       - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/share_db
-      - POSTGRES_USER=sa
-      - POSTGRES_PASSWORD=root
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=root
       - DB_HOST=db
       - DB_PORT=5432
 

@@ -38,6 +38,7 @@ class BookingRepositoryTest {
     @BeforeEach
     void beforeEach() {
         user = userRepository.save(new User(1, "user1", "user1@mail.ru"));
+
         item = itemRepository.save(
                 new Item(1, "item1", "item1 description", true, user, null));
         booking = bookingRepository.save(new Booking(1,
